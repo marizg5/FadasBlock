@@ -160,69 +160,88 @@ html, body {
   color: #FFFFFF; /* Cor vermelha para NOME */
 }
 
-/* ====== FADA SECRETA (EASTER EGG) ====== */
-#fairyEasterEgg {
-  position: fixed;
-  bottom: 100px;
-  right: 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.2s ease;
-  z-index: 99999;
+/* ====== MODO ECLIPSE ====== */
+body.eclipse-mode {
+  background: radial-gradient(circle at center, #0a0a1f 0%, #000 100%);
+  transition: background 1.5s ease, filter 1.5s ease;
+  filter: brightness(0.7);
 }
 
-.fairy-img {
-  width: 120px;
-  height: auto;
-  animation: fairy-float 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+body.eclipse-mode canvas {
+  box-shadow: 0 0 25px rgba(160, 210, 255, 0.4);
 }
 
-.fairy-text {
-  margin-top: 8px;
-  color: #ffeef8;
-  font-weight: 600;
-  text-shadow: 0 0 10px #ffbdf2;
-  font-size: 0.9rem;
-  text-align: center;
+.eclipse-title {
+  color: #a0d2ff !important;
+  text-shadow: 0 0 15px #5eb7ff, 0 0 30px #c0e7ff;
+  transition: all 1s ease;
 }
 
-/* animação flutuante */
-@keyframes fairy-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+/* brilho suave nas peças do jogo (se forem divs ou blocos desenhados) */
+.eclipse-piece {
+  filter: drop-shadow(0 0 8px rgba(160, 210, 255,));
 }
 
-/* classes para mostrar/ocultar */
-.fairy-visible { opacity: 1; }
-.fairy-hidden { opacity: 0; }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: #000 url('https://uploads.onecompiler.io/43rztrxgp/443rt7kap/ChatGPT%20Image%205%20de%20nov.%20de%202025,%2011_13_11.png') center center no-repeat;
+  background-size: 100% 100%; /* <-- cobre absolutamente tudo */
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
 
-/* Estilos para o popup de pause */
+/* Brilho nos blocos no modo Eclipse */
+.eclipse-mode .block-glow {
+  box-shadow: 0 0 10px rgba(160, 210, 255, 0.8),
+              0 0 20px rgba(160, 210, 255, 0.6);
+  filter: brightness(1.2);
+}
+
+/* ===== POPUP DE PAUSA / CONFIGURAÇÕES ===== */
 #pausePopup {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
   justify-content: center;
-  background: rgba(0,0,0,0.7);
-  z-index: 10000;
+  align-items: center;
+  z-index: 999;
 }
 
-.volume-control {
-  margin: 20px 0;
+#pausePopup .modal-content {
+  background: #1b1b1f;
+  color: #fff;
+  padding: 25px 30px;
+  border-radius: 16px;
   text-align: center;
+  max-width: 350px;
+  width: 90%;
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
 }
 
-.volume-control label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
+#pausePopup h2 {
+  margin-bottom: 10px;
 }
 
-#volumeControl {
-  width: 80%;
+#pausePopup ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 20px;
 }
 
+#pausePopup li {
+  font-size: 14px;
+  color: #b5b5b5;
+}
+
+#pausePopup .config {
+  margin: 15px 0;
+}
+
+#pausePopup input[type="range"] {
+  width: 100%;
+  accent-color: #ff6b6b;
+}

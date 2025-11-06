@@ -104,43 +104,42 @@
         <h3>Dicas</h3>
         <ul>
           <p> • Use ↑ para rotacionar; </p>
-          <p> • Evite fazer buracos. </p>
+          <p> • Evite preencher buracos. </p>
         </ul>
       </div>
       
-      <!-- Fada secreta -->
-      <div id="fairyEasterEgg" class="fairy-hidden">
-      <img src="https://i.imgur.com/NshbKZc.png" alt="Fada mágica" class="fairy-img">
-      <p class="fairy-text">✨ A lua sorri para os jogadores persistentes! ✨</p>
-      </div>
-    </aside>
-  </main>
-  <div id="pausePopup" class="modal" style="display: none;">
+       <!-- No popup de pausa, dentro do modal-content, substitua o conteúdo existente por: -->
+<div id="pausePopup" class="modal" style="display: none;">
   <div class="modal-content">
-    <h2>Pause</h2>
-    <p>Desenvolvido por:</p>
+    <h2>Jogo Pausado</h2>
+
+    <p><strong>Desenvolvidos por:</strong></p>
     <ul>
-      <li><a href="https://github.com/massas.png" target="_blank">Ana Carolina</a></li>
-      <li><a href="https://github.com/geraldo-bit" target="_blank">Geraldo Pereira</a></li>
-      <li><a href="https://github.com/marizg5" target="_blank">Mariana Gontijo</a></li>
-      <li><a href="https://github.com/thay" target="_blank">Thayla Pinheiro</a></li>
+      <li><a href="https://github.com/massas-png" target="_blank">Ana Carolina</a></li>
+      <li><a href="https://github.com/geraldo-bit" target="_blank">Geraldo</a></li>
+      <li><a href="https://github.com/marizg5" target="_blank">Mariana</a></li>
+      <li><a href="https://github.com/thaylapinheirob-jpg" target="_blank">Thayla</a></li>
     </ul>
-    </ul>
-    
-    <div class="volume-control">
-      <label for="volumeControl">Volume:</label>
-      <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.5">
-    </div>
-    
-    <div class="modal-actions">
+
+    <button id="resumeBtn" class="btn-primary">Continuar</button>
+  </div>
+</div>
+        <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="0.5">
+      </div>
+
       <button id="resumeBtn" class="btn-primary">Continuar</button>
     </div>
   </div>
-</div>
 
-<!-- Adicionar o elemento de áudio no final do body -->
-<audio id="backgroundMusic" loop>
-  <source src="batata.mp3" type="audio/mpeg">
-</audio>
+  <!-- Música de fundo -->
+  <audio id="backgroundMusic" loop>
+    <source src="trilha.mp3" type="audio/mpeg">
+  </audio>
+</body>
+</html>
+
+      
+    </aside>
+  </main>
 </body>
 </html>

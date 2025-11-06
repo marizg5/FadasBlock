@@ -20,17 +20,6 @@ const clearScoresBtn = document.getElementById('clearScoresBtn');
 const instructionsModal = document.getElementById('instructionsModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 
-const backgroundMusic = document.getElementById('backgroundMusic');
-const pausePopup = document.getElementById('pausePopup');
-const resumeBtn = document.getElementById('resumeBtn');
-const volumeControl = document.getElementById('volumeControl');
-
-const requiredLetters = ['A', 'G', 'T', 'M'];
-
-
-let rgbMode = false;
-let typedLetters = [];
-
 /* ========= Constantes do jogo ========= */
 const COLS = 10;
 const ROWS = 20;
@@ -51,7 +40,6 @@ let linesCleared = 0;
 let elapsedTime = 0;
 let gameOver = false;
 let isPaused = false; // Nova variável para controle de pausa
-
 
 /* Persistência de placares */
 const STORAGE_KEY = 'fadasblock_scores';
@@ -82,11 +70,6 @@ function randomTetromino(){
 /* ========= Início / Reset / Salvar placares ========= */
 function initBoard(){
   board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-  
-  // Adicionar evento para o botão de volume
-volumeControl.addEventListener('input', function() {
-  backgroundMusic.volume = this.value;
-});
 }
 
 function resetGame(){
@@ -152,7 +135,7 @@ function draw(){
   for (let r = 0; r < ROWS; r++){
     for (let c = 0; c < COLS; c++){
       if (board[r][c]){
-        drawBlock(c, r, '#9fcf9a'); // cor dos blocos fixos - verde claro
+        drawBlock(c, r, '#9fcf9a'); // cor dos blocos fixos
       }
     }
   }
@@ -162,55 +145,19 @@ function draw(){
     for (let r = 0; r < current.tetromino.length; r++){
       for (let c = 0; c < current.tetromino[0].length; c++){
         if (current.tetromino[r][c]){
-          drawBlock(current.col + c, current.row + r, '#7c90bd'); // cor da peça atual - azul
+          drawBlock(current.col + c, current.row + r, '#7c90bd');
         }
       }
     }
   }
 }
 
-
-// ====== EASTER EGG DE GERALDO ======
-function drawBlock(col, row, color) {
-  if (rgbMode) {
-    // Cores pastel para o Easter Egg
-    const pastelColors = [
-      // Roxo
-      '#E6E6FA', // Lavanda
-      '#D8BFD8', // Amoras
-      '#DDA0DD', // Lavanda Média
-      '#EE82EE', // Víiola
-      '#DA70D6', // Orchid
-      '#BA55D3', // Media Orchid
-      '#9370DB', // Médio Purple
-      '#8A2BE2', // Blue Violet
-      '#9932CC', // Dark Orchid
-      '#800080', // Purple
-      
-      // Rosa
-      '#FFB6C1', // Rosa Claro
-      '#FF69B4', // Hot Pink
-      '#FF1493', // Deep Pink
-      '#C71585', // Medium Violet Red
-      '#DB7093', // Pale Violet Red
-      '#FF69B4', // Hot Pink
-      '#FFB6C1', // Light Pink
-      '#FFC0CB', // Pink
-      '#F08080', // Light Coral
-      '#FF6347', // Tomato
-    ];
-
-    const randomColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
-    ctx.fillStyle = randomColor;
-  } else {
-    ctx.fillStyle = color;
-  }
-  
-  ctx.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1);
+function drawBlock(col, row, color){
+  ctx.fillStyle = color;
+  ctx.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1); // pequeno espaçamento para grade
   ctx.strokeStyle = 'rgba(255,255,255,0.12)';
   ctx.strokeRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1);
 }
-// ====== FIM DO EASTER EGG DE GERALDO ======
 
 /* Draw next piece scaled to next canvas */
 function drawNext(){
@@ -379,53 +326,31 @@ function togglePause() {
   if (gameOver) return;
   
   isPaused = !isPaused;
+  pauseBtn.textContent = isPaused ? 'Resume' : 'Pause';
   
   if (isPaused) {
-    // Pausar o jogo e mostrar popup
     clearInterval(gameInterval);
     clearInterval(timeInterval);
-    pausePopup.style.display = 'flex';
-    backgroundMusic.pause();
   } else {
-    // Retomar o jogo
-    pausePopup.style.display = 'none';
-    gameInterval = setInterval(drop, speed);
-    timeInterval = setInterval(() => {
-      if (!gameOver) {
-        elapsedTime++;
-        updateTimeDisplay();
-      }
-    }, 1000);
-    backgroundMusic.play();
+    // Reinicia os intervalos apenas se o jogo ainda estiver ativo
+    if (!gameOver) {
+      gameInterval = setInterval(drop, speed);
+      timeInterval = setInterval(() => {
+        if (!gameOver) {
+          elapsedTime++;
+          updateTimeDisplay();
+        }
+      }, 1000);
+    }
   }
 }
 
 /* ========= Input e eventos ========= */
-document.addEventListener('keydown', (e) => {
-  // Verifica se estamos no campo de nome
-  if (document.activeElement === nameInput) {
-    // Verifica se a tecla é uma das letras necessárias
-    if (['A', 'G', 'T', 'M'].includes(e.key.toUpperCase())) {
-      typedLetters.push(e.key.toUpperCase());
-      
-      // Verifica se temos todas as 4 letras (não importa a ordem)
-      const uniqueLetters = [...new Set(typedLetters)];
-      if (uniqueLetters.length === 4 && uniqueLetters.every(letter => ['A', 'G', 'T', 'M'].includes(letter))) {
-        rgbMode = true;
-        typedLetters = []; // Reseta o contador
-        
-        // ====== EASTER EGG DE GERALDO ======
-        // Adiciona efeito visual para mostrar que o modo RGB está ativo
-        document.body.style.filter = 'hue-rotate(90deg)';
-        // ====== FIM DO EASTER EGG DE GERALDO ======
-      }
-    }
-  }
-
-  // Não interfere com outros eventos de teclado
+document.addEventListener('keydown', (e)=>{
+  // não pegar input quando foco em field de texto
   if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
 
-  switch (e.key) {
+  switch (e.key){
     case 'ArrowLeft': e.preventDefault(); moveLeft(); break;
     case 'ArrowRight': e.preventDefault(); moveRight(); break;
     case 'ArrowDown': e.preventDefault(); drop(); break;
@@ -494,17 +419,6 @@ function renderScoreTable(){
 
 renderScoreTable();
 
-// Adicionar evento para o botão de continuar
-resumeBtn.addEventListener('click', function() {
-  togglePause();
-});
-
-// Iniciar música ao carregar a página
-window.addEventListener('load', function() {
-  backgroundMusic.volume = volumeControl.value;
-  backgroundMusic.play().catch(e => console.log("Erro ao reproduzir música:", e));
-});
-
 /* ========= Inicialização visual ========= */
 function initialDraw(){
   draw();
@@ -514,39 +428,144 @@ function initialDraw(){
 initBoard();
 initialDraw();
 
-/* ====== EASTER EGG: FADA SECRETA ====== */
-let consecutiveLines = 0; // contador de linhas seguidas
+/* ====== EASTER EGG: MODO ECLIPSE ====== */
+let eclipseInput = ""; // guarda as teclas digitadas
+let eclipseActive = false;
 
-// Pega referência ao elemento da fada
-const fairyEl = document.getElementById('fairyEasterEgg');
+document.addEventListener("keydown", (event) => {
+  eclipseInput += event.key.toLowerCase();
 
-// Mostra a fada mágica
-function showFairy() {
-  fairyEl.classList.remove('fairy-hidden');
-  fairyEl.classList.add('fairy-visible');
+  // mantém o buffer pequeno (máx. 7 letras)
+  if (eclipseInput.length > 7) {
+    eclipseInput = eclipseInput.slice(-7);
+  }
 
-  // Depois de 6 segundos, ela desaparece
-  setTimeout(() => {
-    fairyEl.classList.remove('fairy-visible');
-    fairyEl.classList.add('fairy-hidden');
-  }, 6000);
+  // verifica se o jogador digitou "eclipse"
+  if (eclipseInput.includes("eclipse") && !eclipseActive) {
+    activateEclipseMode();
+  }
+});
+
+function activateEclipseMode() {
+  eclipseActive = true;
+  document.body.classList.add("eclipse-mode");
+
+  // altera título se existir
+  const title = document.querySelector("h1, .title");
+  if (title) {
+    title.textContent = "🌑 MOONBLOCK – Eclipse Mode";
+    title.classList.add("eclipse-title");
+  }
+
+  // toca som de fundo se existir o elemento <audio>
+  const sound = document.getElementById("eclipseSound");
+  if (sound) {
+    sound.currentTime = 0;
+    sound.volume = 0.4;
+    sound.play().catch(() => {});
+  }
+
+  // adiciona brilho nas peças (opcional)
+  const canvas = document.querySelector("canvas");
+  if (canvas) canvas.classList.add("eclipse-piece");
+
+  // mensagem visual breve
+  const msg = document.createElement("div");
+  msg.style.position = "fixed";
+  msg.style.top = "50%";
+  msg.style.left = "50%";
+  msg.style.transform = "translate(-50%, -50%)";
+  msg.style.color = "#a0d2ff";
+  msg.style.fontSize = "1.2rem";
+  msg.style.textShadow = "0 0 15px #c0e7ff";
+  msg.style.opacity = "0";
+  msg.style.transition = "opacity 2s ease";
+  msg.style.zIndex = "9999";
+  document.body.appendChild(msg);
+  setTimeout(() => (msg.style.opacity = "1"), 100);
+  setTimeout(() => (msg.style.opacity = "0"), 4000);
+  setTimeout(() => msg.remove(), 6000);
 }
 
-// Modifica a função clearLines para incluir o contador de easter egg
-const oldClearLines = clearLines;
-clearLines = function() {
-  let before = linesCleared;
-  oldClearLines(); // executa a função original
-  let gained = linesCleared - before;
+function drawBlock(col, row, color){
+  ctx.fillStyle = color;
+  ctx.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1);
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.strokeRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1);
 
-  if (gained > 0) {
-    consecutiveLines += gained;
-    if (consecutiveLines >= 5) { // ativa o easter egg
-      showFairy();
-      consecutiveLines = 0; // reseta o contador
-    }
-  } else {
-    // se não limpou nenhuma linha nessa jogada, reseta o contador
-    consecutiveLines = 0;
+  // Adiciona brilho no modo Eclipse
+  if (document.body.classList.contains('eclipse-mode')) {
+    ctx.shadowColor = 'rgba(160, 210, 255, 0.8)';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(col * BLOCK_SIZE, row * BLOCK_SIZE, BLOCK_SIZE-1, BLOCK_SIZE-1);
+    ctx.shadowBlur = 0;
   }
-};
+}
+
+/* ========= POPUP DE PAUSA / CONFIGURAÇÕES ========= */
+
+// Referências aos elementos
+const pausePopup = document.getElementById('pausePopup');
+const resumeBtn = document.getElementById('resumeBtn');
+const volumeControl = document.getElementById('volumeControl');
+const backgroundMusic = document.getElementById('backgroundMusic');
+
+// Controle de volume
+volumeControl.addEventListener('input', function() {
+  backgroundMusic.volume = this.value;
+});
+
+// Iniciar música ao carregar a página
+window.addEventListener('load', function() {
+  backgroundMusic.volume = volumeControl.value;
+  backgroundMusic.play().catch(e => console.log("Erro ao reproduzir música:", e));
+});
+
+// Função de pausa/retorno do jogo
+function togglePause() {
+  if (gameOver) return;
+
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    // Pausa o jogo
+    clearInterval(gameInterval);
+    clearInterval(timeInterval);
+    backgroundMusic.pause();
+    pausePopup.style.display = 'flex';
+  } else {
+    // Retoma o jogo
+    pausePopup.style.display = 'none';
+    backgroundMusic.play();
+
+    gameInterval = setInterval(drop, speed);
+    timeInterval = setInterval(() => {
+      if (!gameOver) {
+        elapsedTime++;
+        updateTimeDisplay();
+      }
+    }, 1000);
+  }
+}
+
+// Botão continuar
+resumeBtn.addEventListener('click', togglePause);
+
+/* ========= EXIBIR CRÉDITOS NO POPUP ========= */
+function showDeveloperCredits() {
+  const devList = devs.map(name => `<li>${name}</li>`).join('');
+  const content = `
+    <h2>Jogo Pausado</h2>
+    <p><strong>Desenvolvido por:</strong></p>
+    <ul>${devList}</ul>
+    <div class="config">
+      <input type="range" id="volumeControl" min="0" max="1" step="0.05" value="${backgroundMusic.volume}">
+    </div>
+    <button id="resumeBtn" class="btn-primary">Continuar</button>
+  `;
+  pausePopup.innerHTML = `<div class="modal-content">${content}</div>`;
+}
+
+
+
+
